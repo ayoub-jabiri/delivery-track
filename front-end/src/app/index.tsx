@@ -1,4 +1,5 @@
 import "@/global.css";
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
 export default function HomeScreen() {
@@ -11,6 +12,7 @@ export default function HomeScreen() {
                 This card is styled with className, so if you can see the
                 colored box, NativeWind is working.
             </Text>
+            <Link href="/1/delivery-details">Do to Delivery Details</Link>
         </View>
     );
 }
