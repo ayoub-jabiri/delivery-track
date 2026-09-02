@@ -88,7 +88,7 @@ export default function DeliveryDetailsScreen() {
                     )}
                 </View>
                 <Text style={styles.checkboxText}>
-                    I confirm arrival at the correct address. status:{" "}
+                    I confirm arrival at the correct address.
                 </Text>
             </TouchableOpacity>
 
