@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -8,103 +8,169 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../styles/colors";
+import { useLocalSearchParams } from "expo-router";
+import { getDeliveryDetails } from "@/src/services/delivery.service";
+import { Delivery } from "@/src/types";
 
 export default function DeliveryDetailsScreen() {
+    const { id } = useLocalSearchParams();
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [deliveryDetails, setDeliveryDetails] = useState<Delivery | null>(
+        null
+    );
+    const [error, setError] = useState<boolean>(false);
+
     const [isConfirmed, setIsConfirmed] = useState(false);
+
+    useEffect(() => {
+        const fetchDeliveryDetails = async () => {
+            try {
+                const response = await getDeliveryDetails(id);
+
+                setDeliveryDetails(response.data);
+            } catch (error) {
+                console.error("Error fetching delivery details:", error);
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDeliveryDetails();
+    }, []);
 
     return (
         <ScrollView
             contentContainerStyle={[styles.container, styles.scrollContent]}
         >
-            <View style={styles.headerRow}>
-                <Text style={styles.idText}>ID: TRK-9824-A7X</Text>
-                <View style={styles.badge}>
-                    <Ionicons
-                        name="ellipsis-horizontal-circle"
-                        size={14}
-                        color="#D97706"
-                    />
-                    <Text style={styles.badgeText}>PENDING</Text>
-                </View>
-            </View>
+            {loading && <Text>Loading delivery details...</Text>}
 
-            <Text style={styles.nameText}>Sarah Jenkins</Text>
-
-            <View style={styles.dateRow}>
-                <View style={styles.dateItem}>
-                    <Ionicons
-                        name="calendar-outline"
-                        size={14}
-                        color="#64748B"
-                    />
-                    <Text style={styles.dateText}>Created: Oct 24, 2023</Text>
-                </View>
-                <View style={styles.dateItem}>
-                    <Ionicons name="time-outline" size={14} color="#64748B" />
-                    <Text style={styles.dateText}>Updated: 2 hrs ago</Text>
-                </View>
-            </View>
-
-            <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <Ionicons
-                        name="location-outline"
-                        size={20}
-                        color="#1E3A8A"
-                    />
-                    <Text style={styles.cardTitle}>Delivery Address</Text>
-                </View>
-                <View style={styles.divider} />
-                <Text style={styles.cardBodyText}>
-                    4822 Birchwood Lane{"\n"}
-                    Apt 3B{"\n"}
-                    Seattle, WA 98109
+            {error && !loading && (
+                <Text>
+                    No delivery details available. Please check the delivery ID
+                    or try again later.
                 </Text>
-            </View>
+            )}
 
-            <View style={styles.card}>
-                <Text style={styles.instructionLabel}>
-                    Delivery Instructions
-                </Text>
-                <Text style={styles.instructionText}>
-                    Please leave package behind the potted plants near the front
-                    door. Do not ring doorbell, baby sleeping.
-                </Text>
-            </View>
+            {deliveryDetails && (
+                <>
+                    <View style={styles.headerRow}>
+                        <Text style={styles.idText}>
+                            ID: {deliveryDetails._id}
+                        </Text>
+                        <View style={styles.badge}>
+                            <Ionicons
+                                name="ellipsis-horizontal-circle"
+                                size={14}
+                                color="#D97706"
+                            />
+                            <Text style={styles.badgeText}>
+                                {deliveryDetails.status}
+                            </Text>
+                        </View>
+                    </View>
 
-            <TouchableOpacity
-                style={styles.checkboxContainer}
-                activeOpacity={0.7}
-                onPress={() => setIsConfirmed(!isConfirmed)}
-            >
-                <View
-                    style={[
-                        styles.checkbox,
-                        isConfirmed && styles.checkboxChecked,
-                    ]}
-                >
-                    {isConfirmed && (
-                        <Ionicons name="checkmark" size={16} color="white" />
-                    )}
-                </View>
-                <Text style={styles.checkboxText}>
-                    I confirm arrival at the correct address.
-                </Text>
-            </TouchableOpacity>
+                    <Text style={styles.nameText}>
+                        {deliveryDetails.recipientName}
+                    </Text>
 
-            <TouchableOpacity style={styles.confirmButton}>
-                <Ionicons
-                    name="checkmark-circle-outline"
-                    size={20}
-                    color="white"
-                />
-                <Text style={styles.buttonText}>Confirm Delivery</Text>
-            </TouchableOpacity>
+                    <View style={styles.dateRow}>
+                        <View style={styles.dateItem}>
+                            <Ionicons
+                                name="calendar-outline"
+                                size={14}
+                                color="#64748B"
+                            />
+                            <Text style={styles.dateText}>
+                                Created:{" "}
+                                {new Date(
+                                    deliveryDetails.createdAt
+                                ).toLocaleDateString()}
+                            </Text>
+                        </View>
+                        <View style={styles.dateItem}>
+                            <Ionicons
+                                name="time-outline"
+                                size={14}
+                                color="#64748B"
+                            />
+                            <Text style={styles.dateText}>
+                                Updated: 2 hrs ago
+                            </Text>
+                        </View>
+                    </View>
 
-            <TouchableOpacity style={styles.cancelButton}>
-                <Ionicons name="close-circle-outline" size={20} color="white" />
-                <Text style={styles.buttonText}>Cancel Delivery</Text>
-            </TouchableOpacity>
+                    <View style={styles.card}>
+                        <View style={styles.cardHeader}>
+                            <Ionicons
+                                name="location-outline"
+                                size={20}
+                                color="#1E3A8A"
+                            />
+                            <Text style={styles.cardTitle}>
+                                Delivery Address
+                            </Text>
+                        </View>
+                        <View style={styles.divider} />
+                        <Text style={styles.cardBodyText}>
+                            {deliveryDetails.address}
+                        </Text>
+                    </View>
+
+                    <View style={styles.card}>
+                        <Text style={styles.instructionLabel}>
+                            Delivery Instructions
+                        </Text>
+                        <Text style={styles.instructionText}>
+                            Please leave package behind the potted plants near
+                            the front door. Do not ring doorbell, baby sleeping.
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity
+                        style={styles.checkboxContainer}
+                        activeOpacity={0.7}
+                        onPress={() => setIsConfirmed(!isConfirmed)}
+                    >
+                        <View
+                            style={[
+                                styles.checkbox,
+                                isConfirmed && styles.checkboxChecked,
+                            ]}
+                        >
+                            {isConfirmed && (
+                                <Ionicons
+                                    name="checkmark"
+                                    size={16}
+                                    color="white"
+                                />
+                            )}
+                        </View>
+                        <Text style={styles.checkboxText}>
+                            I confirm arrival at the correct address.
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.confirmButton}>
+                        <Ionicons
+                            name="checkmark-circle-outline"
+                            size={20}
+                            color="white"
+                        />
+                        <Text style={styles.buttonText}>Confirm Delivery</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.cancelButton}>
+                        <Ionicons
+                            name="close-circle-outline"
+                            size={20}
+                            color="white"
+                        />
+                        <Text style={styles.buttonText}>Cancel Delivery</Text>
+                    </TouchableOpacity>
+                </>
+            )}
         </ScrollView>
     );
 }
