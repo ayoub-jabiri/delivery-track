@@ -15,3 +15,6 @@ export const EditDelivery = async (
         `http://192.168.20.5:3000/api/deliveries/${deliveryId}`,
         delivery
     );
+
+export const cancelDelivery = async (deliveryId: string | string[]) =>
+    await axios.delete(`http://192.168.20.5:3000/api/deliveries/${deliveryId}`);
