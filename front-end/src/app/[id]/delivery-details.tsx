@@ -8,12 +8,16 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../styles/colors";
-import { useLocalSearchParams } from "expo-router";
-import { getDeliveryDetails } from "@/src/services/delivery.service";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+    cancelDelivery,
+    getDeliveryDetails,
+} from "@/src/services/delivery.service";
 import { Delivery } from "@/src/types";
 
 export default function DeliveryDetailsScreen() {
     const { id } = useLocalSearchParams();
+    const router = useRouter();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [deliveryDetails, setDeliveryDetails] = useState<Delivery | null>(
@@ -28,8 +32,6 @@ export default function DeliveryDetailsScreen() {
             try {
                 const response = await getDeliveryDetails(id);
 
-                
-
                 setDeliveryDetails(response.data);
             } catch (error) {
                 console.error("Error fetching delivery details:", error);
@@ -41,6 +43,16 @@ export default function DeliveryDetailsScreen() {
 
         fetchDeliveryDetails();
     }, []);
+
+    async function handleCancelDelivery() {
+        try {
+            await cancelDelivery(id);
+
+            return router.navigate("/");
+        } catch (error) {
+            console.error("Error cancelling delivery:", error);
+        }
+    }
 
     return (
         <ScrollView
@@ -163,7 +175,10 @@ export default function DeliveryDetailsScreen() {
                         <Text style={styles.buttonText}>Confirm Delivery</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.cancelButton}>
+                    <TouchableOpacity
+                        style={styles.cancelButton}
+                        onPress={handleCancelDelivery}
+                    >
                         <Ionicons
                             name="close-circle-outline"
                             size={20}

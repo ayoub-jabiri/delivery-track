@@ -16,7 +16,7 @@ export default function HomeScreen() {
                 Do to Delivery Details
             </Link>
             <Link href="/add-delivery">Add Delivery</Link>
-            <Link href="/6a9954fd1936cbb00fffb9d1/edit-delivery">Update</Link>
+            <Link href="/6a98a63830daa7bd20689881/edit-delivery">Update</Link>
         </View>
     );
 }
