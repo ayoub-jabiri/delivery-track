@@ -6,3 +6,6 @@ export const getDeliveryDetails = async (deliveryId: string | string[]) =>
 
 export const addDelivery = async (delivery: Delivery) =>
     await axios.post(`http://192.168.20.235:3000/api/deliveries`, delivery);
+
+export const EditDelivery = async (deliveryId: string | string[] ,delivery:Delivery) =>
+    await axios.put(`http://192.168.20.235:3000/api/deliveries/${deliveryId}`,delivery);

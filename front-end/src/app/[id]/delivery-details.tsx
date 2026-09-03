@@ -28,6 +28,8 @@ export default function DeliveryDetailsScreen() {
             try {
                 const response = await getDeliveryDetails(id);
 
+                
+
                 setDeliveryDetails(response.data);
             } catch (error) {
                 console.error("Error fetching delivery details:", error);

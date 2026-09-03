@@ -11,6 +11,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { Delivery, DeliveryStatus } from "@/src/types";
 import { addDelivery } from "../services/delivery.service";
 import { useRouter } from "expo-router";
+import { colors } from "./styles/colors";
 
 export default function DeliveryForm() {
     const [delivery, setDelivery] = useState<Delivery>({
@@ -20,6 +21,7 @@ export default function DeliveryForm() {
     });
 
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const router = useRouter();
 
@@ -36,6 +38,11 @@ export default function DeliveryForm() {
 
             return router.navigate("/");
         } catch (error) {
+            const currentError: string = error.response?.data?.errors
+                ? "You have to fill all the required data"
+                : "Something went wrong";
+            setError(error.response.data.errors);
+
             console.error(error);
         }
     }
@@ -95,6 +102,18 @@ export default function DeliveryForm() {
                 </TouchableOpacity>
 
                 <View style={styles.divider} />
+
+                {error && (
+                    <Text
+                        style={{
+                            paddingVertical: 30,
+                            color: colors.red,
+                            fontWeight: "bold",
+                        }}
+                    >
+                        * {error}
+                    </Text>
+                )}
 
                 <TouchableOpacity
                     style={styles.saveButton}
