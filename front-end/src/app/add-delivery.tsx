@@ -34,9 +34,6 @@ export default function DeliveryForm() {
         try {
             await addDelivery(delivery);
 
-            console.log("tkhrbi9aaaaaaaaaaaaaaa");
-            
-
             return router.navigate("/");
         } catch (error) {
             console.error(error);
