@@ -14,8 +14,8 @@ import {
     EditDelivery,
     getDeliveryDetails,
 } from "../../services/delivery.service";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { colors } from "../styles/colors";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import { colors } from "../../styles/colors";
 
 export default function EditDeliveryScreen() {
     const [delivery, setDelivery] = useState<Delivery>({
@@ -25,11 +25,10 @@ export default function EditDeliveryScreen() {
     });
 
     const { id } = useLocalSearchParams();
+    const navigation = useNavigation();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const router = useRouter();
 
     const statusOptions = ["pending", "delivered"];
 
@@ -61,7 +60,7 @@ export default function EditDeliveryScreen() {
         try {
             await EditDelivery(id, delivery);
 
-            return router.navigate("/");
+            navigation.goBack();
         } catch (error) {
             const currentError: string = error.response?.data?.errors
                 ? "You have to fill all the required data"

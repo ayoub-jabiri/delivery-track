@@ -11,7 +11,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { Delivery, DeliveryStatus } from "@/src/types";
 import { addDelivery } from "../services/delivery.service";
 import { useRouter } from "expo-router";
-import { colors } from "./styles/colors";
+import { colors } from "../styles/colors";
 
 export default function DeliveryForm() {
     const [delivery, setDelivery] = useState<Delivery>({

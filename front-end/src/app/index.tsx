@@ -12,11 +12,11 @@ export default function HomeScreen() {
                 This card is styled with className, so if you can see the
                 colored box, NativeWind is working.
             </Text>
-            <Link href="/6a98a63830daa7bd20689881/delivery-details">
+            <Link href="/6a9a8e399ca98a88b6b7f66d/delivery-details">
                 Do to Delivery Details
             </Link>
             <Link href="/add-delivery">Add Delivery</Link>
-            <Link href="/6a98a63830daa7bd20689881/edit-delivery">Update</Link>
+            <Link href="/6a9a8e399ca98a88b6b7f66d/edit-delivery">Update</Link>
         </View>
     );
 }
