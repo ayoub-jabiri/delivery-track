@@ -7,10 +7,12 @@ import {
     TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../styles/colors";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { colors } from "../../styles/colors";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
     cancelDelivery,
+    confirmDelivery,
     getDeliveryDetails,
 } from "@/src/services/delivery.service";
 import { Delivery } from "@/src/types";
@@ -24,8 +26,6 @@ export default function DeliveryDetailsScreen() {
         null
     );
     const [error, setError] = useState<boolean>(false);
-
-    const [isConfirmed, setIsConfirmed] = useState(false);
 
     useEffect(() => {
         const fetchDeliveryDetails = async () => {
@@ -43,6 +43,16 @@ export default function DeliveryDetailsScreen() {
 
         fetchDeliveryDetails();
     }, []);
+
+    async function handleConfirmDelivery() {
+        try {
+            await confirmDelivery(id);
+
+            return router.navigate("/");
+        } catch (error) {
+            console.error("Error cancelling delivery:", error);
+        }
+    }
 
     async function handleCancelDelivery() {
         try {
@@ -73,16 +83,29 @@ export default function DeliveryDetailsScreen() {
                         <Text style={styles.idText}>
                             ID: {deliveryDetails._id}
                         </Text>
-                        <View style={styles.badge}>
-                            <Ionicons
-                                name="ellipsis-horizontal-circle"
-                                size={14}
-                                color="#D97706"
-                            />
-                            <Text style={styles.badgeText}>
-                                {deliveryDetails.status}
-                            </Text>
-                        </View>
+                        {deliveryDetails.status === "pending" ? (
+                            <View style={styles.pendingBadge}>
+                                <Ionicons
+                                    name="ellipsis-horizontal-circle"
+                                    size={14}
+                                    color="#D97706"
+                                />
+                                <Text style={styles.pendingBadgeText}>
+                                    pending
+                                </Text>
+                            </View>
+                        ) : (
+                            <View style={styles.deliveredBadge}>
+                                <Ionicons
+                                    name="ellipsis-horizontal-circle"
+                                    size={14}
+                                    color="#065F46"
+                                />
+                                <Text style={styles.deliveredBadgeText}>
+                                    delivered
+                                </Text>
+                            </View>
+                        )}
                     </View>
 
                     <Text style={styles.nameText}>
@@ -101,16 +124,6 @@ export default function DeliveryDetailsScreen() {
                                 {new Date(
                                     deliveryDetails.createdAt
                                 ).toLocaleDateString()}
-                            </Text>
-                        </View>
-                        <View style={styles.dateItem}>
-                            <Ionicons
-                                name="time-outline"
-                                size={14}
-                                color="#64748B"
-                            />
-                            <Text style={styles.dateText}>
-                                Updated: 2 hrs ago
                             </Text>
                         </View>
                     </View>
@@ -143,36 +156,39 @@ export default function DeliveryDetailsScreen() {
                     </View>
 
                     <TouchableOpacity
-                        style={styles.checkboxContainer}
-                        activeOpacity={0.7}
-                        onPress={() => setIsConfirmed(!isConfirmed)}
+                        style={styles.confirmButton}
+                        onPress={handleConfirmDelivery}
                     >
-                        <View
-                            style={[
-                                styles.checkbox,
-                                isConfirmed && styles.checkboxChecked,
-                            ]}
-                        >
-                            {isConfirmed && (
-                                <Ionicons
-                                    name="checkmark"
-                                    size={16}
-                                    color="white"
-                                />
-                            )}
-                        </View>
-                        <Text style={styles.checkboxText}>
-                            I confirm arrival at the correct address.
-                        </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.confirmButton}>
                         <Ionicons
                             name="checkmark-circle-outline"
                             size={20}
                             color="white"
                         />
                         <Text style={styles.buttonText}>Confirm Delivery</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => router.navigate(`/${id}/edit-delivery`)}
+                    >
+                        <MaterialIcons
+                            name="edit"
+                            size={14}
+                            color={colors.blue}
+                            style={{
+                                width: 20,
+                                height: 20,
+                                borderWidth: 1,
+                                borderColor: colors.blue,
+                                borderRadius: 20 / 2,
+                                padding: 2,
+                            }}
+                        />
+                        <Text
+                            style={[styles.buttonText, { color: colors.blue }]}
+                        >
+                            Edit Delivery
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -212,7 +228,7 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         letterSpacing: 0.5,
     },
-    badge: {
+    pendingBadge: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#FEF3C7",
@@ -221,9 +237,24 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         gap: 4,
     },
-    badgeText: {
+    pendingBadgeText: {
         fontSize: 10,
         color: "#D97706",
+        fontWeight: "700",
+        letterSpacing: 0.5,
+    },
+    deliveredBadge: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#D1FAE5",
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        gap: 4,
+    },
+    deliveredBadgeText: {
+        fontSize: 10,
+        color: colors.green,
         fontWeight: "700",
         letterSpacing: 0.5,
     },
@@ -321,6 +352,19 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         backgroundColor: colors.blue,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 16,
+        borderRadius: 8,
+        marginBottom: 12,
+        gap: 8,
+    },
+    editButton: {
+        backgroundColor: colors.background,
+        borderWidth: 1,
+        borderStyle: "solid",
+        borderColor: colors.blue,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
