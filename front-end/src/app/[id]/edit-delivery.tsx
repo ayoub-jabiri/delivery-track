@@ -10,7 +10,6 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Delivery, DeliveryStatus } from "@/src/types";
 import {
-    addDelivery,
     EditDelivery,
     getDeliveryDetails,
 } from "../../services/delivery.service";
@@ -30,7 +29,7 @@ export default function EditDeliveryScreen() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const statusOptions = ["pending", "delivered"];
+    const statusOptions: DeliveryStatus[] = ["pending", "delivered"];
 
     const handleSelectStatus = (selectedOption: DeliveryStatus) => {
         setDelivery({ ...delivery, status: selectedOption });
@@ -42,19 +41,19 @@ export default function EditDeliveryScreen() {
             try {
                 const response = await getDeliveryDetails(id);
 
-                setDelivery({
-                    ...delivery,
+                setDelivery((prev) => ({
+                    ...prev,
                     recipientName: response.data.recipientName,
                     address: response.data.address,
                     status: response.data.status,
-                });
+                }));
             } catch (error) {
                 console.error("Error fetching delivery details:", error);
             }
         };
 
         fetchDeliveryDetails();
-    }, []);
+    }, [id]);
 
     async function handleSaveDelivery() {
         try {
@@ -62,12 +61,16 @@ export default function EditDeliveryScreen() {
 
             navigation.goBack();
         } catch (error) {
-            const currentError: string = error.response?.data?.errors
-                ? "You have to fill all the required data"
-                : "Something went wrong";
-            setError(error.response.data.errors);
-
             console.error(error);
+
+            const data = (
+                error as { response?: { data?: { errors?: unknown } } }
+            ).response?.data;
+            setError(
+                Array.isArray(data?.errors)
+                    ? data.errors.join(", ")
+                    : "Something went wrong"
+            );
         }
     }
 

@@ -42,7 +42,7 @@ export default function DeliveryDetailsScreen() {
         };
 
         fetchDeliveryDetails();
-    }, []);
+    }, [id]);
 
     async function handleConfirmDelivery() {
         try {
@@ -121,9 +121,11 @@ export default function DeliveryDetailsScreen() {
                             />
                             <Text style={styles.dateText}>
                                 Created:{" "}
-                                {new Date(
-                                    deliveryDetails.createdAt
-                                ).toLocaleDateString()}
+                                {deliveryDetails.createdAt
+                                    ? new Date(
+                                          deliveryDetails.createdAt
+                                      ).toLocaleDateString()
+                                    : "—"}
                             </Text>
                         </View>
                     </View>

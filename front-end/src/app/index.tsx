@@ -1,22 +1,61 @@
 import "@/global.css";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { Text, View } from "react-native";
+import { useState } from "react";
+import { FlatList, Pressable } from "react-native";
+import Container from "@/components/container";
+import DeliveryCard from "@/components/delivery-card";
+import EmptyState from "@/components/empty-state";
+import ErrorScreen from "@/components/error-screen";
+import LoadingScreen from "@/components/loading-screen";
+import SearchBar from "@/components/search-bar";
+import { getAllDeliveries } from "@/src/services/delivery.service";
+import { Delivery } from "@/src/types";
 
 export default function HomeScreen() {
+    const [query, setQuery] = useState("");
+
+    const { data: deliveries, isLoading, isError, refetch } = useQuery<Delivery[]>({
+        queryKey: ["deliveries"],
+        queryFn: async () => (await getAllDeliveries()).data,
+    });
+
+    const filtered = query
+        ? (deliveries ?? []).filter((delivery) => {
+              const term = query.toLowerCase();
+              return (
+                  delivery.recipientName.toLowerCase().includes(term) ||
+                  delivery.address.toLowerCase().includes(term)
+              );
+          })
+        : (deliveries ?? []);
+
+    if (isLoading) {
+        return <LoadingScreen />;
+    }
+
+    if (isError) {
+        return <ErrorScreen onRetry={refetch} />;
+    }
+
     return (
-        <View className="my-auto mx-2  rounded-2xl border bg-background px-4 py-3 ">
-            <Text className="text-sm font-semibold uppercase tracking-wide text-primary ">
-                NativeWind check
-            </Text>
-            <Text className="mt-1 text-base text-foreground ">
-                This card is styled with className, so if you can see the
-                colored box, NativeWind is working.
-            </Text>
-            <Link href="/6a9a8e399ca98a88b6b7f66d/delivery-details">
-                Do to Delivery Details
-            </Link>
-            <Link href="/add-delivery">Add Delivery</Link>
-            <Link href="/6a9a8e399ca98a88b6b7f66d/edit-delivery">Update</Link>
-        </View>
+        <Container>
+            <FlatList
+                data={filtered}
+                keyExtractor={(item) => item._id ?? item.recipientName}
+                contentContainerClassName="gap-3 p-4"
+                ListHeaderComponent={
+                    <SearchBar value={query} onChangeText={setQuery} />
+                }
+                renderItem={({ item }) => (
+                    <Link href={`/${item._id}/delivery-details`} asChild>
+                        <Pressable>
+                            <DeliveryCard delivery={item} />
+                        </Pressable>
+                    </Link>
+                )}
+                ListEmptyComponent={<EmptyState hasSearch={query.length > 0} />}
+            />
+        </Container>
     );
 }

@@ -25,7 +25,7 @@ export default function DeliveryForm() {
 
     const router = useRouter();
 
-    const statusOptions = ["pending", "delivered"];
+    const statusOptions: DeliveryStatus[] = ["pending", "delivered"];
 
     const handleSelectStatus = (selectedOption: DeliveryStatus) => {
         setDelivery({ ...delivery, status: selectedOption });
@@ -38,12 +38,16 @@ export default function DeliveryForm() {
 
             return router.navigate("/");
         } catch (error) {
-            const currentError: string = error.response?.data?.errors
-                ? "You have to fill all the required data"
-                : "Something went wrong";
-            setError(error.response.data.errors);
-
             console.error(error);
+
+            const data = (
+                error as { response?: { data?: { errors?: unknown } } }
+            ).response?.data;
+            setError(
+                Array.isArray(data?.errors)
+                    ? data.errors.join(", ")
+                    : "Something went wrong"
+            );
         }
     }
 
