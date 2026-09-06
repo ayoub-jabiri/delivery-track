@@ -5,8 +5,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL is not defined");
 
-export const getAllDeliveries = async () =>
-  await axios.get(`${API_URL}/api/deliveries`);
+export const getAllDeliveries = async () => await axios.get(`${API_URL}/api/deliveries`);
 
 export const getDeliveryDetails = async (deliveryId: string | string[]) =>
   await axios.get(`${API_URL}/api/deliveries/${deliveryId}`);
