@@ -1,21 +1,26 @@
 import "@/global.css";
+import Container from "@/src/components/container";
+import DeliveryCard from "@/src/components/delivery-card";
+import EmptyState from "@/src/components/empty-state";
+import ErrorScreen from "@/src/components/error-screen";
+import LoadingScreen from "@/src/components/loading-screen";
+import SearchBar from "@/src/components/search-bar";
+import { getAllDeliveries } from "@/src/services/delivery.service";
+import { Delivery } from "@/src/types";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { FlatList, Pressable } from "react-native";
-import Container from "@/components/container";
-import DeliveryCard from "@/components/delivery-card";
-import EmptyState from "@/components/empty-state";
-import ErrorScreen from "@/components/error-screen";
-import LoadingScreen from "@/components/loading-screen";
-import SearchBar from "@/components/search-bar";
-import { getAllDeliveries } from "@/src/services/delivery.service";
-import { Delivery } from "@/src/types";
 
 export default function HomeScreen() {
     const [query, setQuery] = useState("");
 
-    const { data: deliveries, isLoading, isError, refetch } = useQuery<Delivery[]>({
+    const {
+        data: deliveries,
+        isLoading,
+        isError,
+        refetch,
+    } = useQuery<Delivery[]>({
         queryKey: ["deliveries"],
         queryFn: async () => (await getAllDeliveries()).data,
     });
@@ -28,7 +33,7 @@ export default function HomeScreen() {
                   delivery.address.toLowerCase().includes(term)
               );
           })
-        : (deliveries ?? []);
+        : deliveries ?? [];
 
     if (isLoading) {
         return <LoadingScreen />;
