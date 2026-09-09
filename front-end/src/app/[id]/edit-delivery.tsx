@@ -1,19 +1,19 @@
+import { Delivery, DeliveryStatus } from "@/src/types";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+    Modal,
     StyleSheet,
     Text,
-    View,
     TextInput,
     TouchableOpacity,
-    Modal,
+    View,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { Delivery, DeliveryStatus } from "@/src/types";
 import {
     EditDelivery,
     getDeliveryDetails,
 } from "../../services/delivery.service";
-import { useLocalSearchParams, useNavigation } from "expo-router";
 import { colors } from "../../styles/colors";
 
 export default function EditDeliveryScreen() {
@@ -48,7 +48,10 @@ export default function EditDeliveryScreen() {
                     status: response.data.status,
                 }));
             } catch (error) {
-                console.error("Error fetching delivery details:", error);
+                console.error(
+                    "Error fetching delivery details:",
+                    error.response
+                );
             }
         };
 
@@ -61,7 +64,7 @@ export default function EditDeliveryScreen() {
 
             navigation.goBack();
         } catch (error) {
-            console.error(error);
+            console.error("Error saving delivery:", error.response);
 
             const data = (
                 error as { response?: { data?: { errors?: unknown } } }
@@ -69,6 +72,8 @@ export default function EditDeliveryScreen() {
             setError(
                 Array.isArray(data?.errors)
                     ? data.errors.join(", ")
+                    : error.response?.data?.error
+                    ? error.response.data.error
                     : "Something went wrong"
             );
         }
@@ -159,6 +164,7 @@ export default function EditDeliveryScreen() {
                 <TouchableOpacity
                     style={styles.cancelButton}
                     activeOpacity={0.7}
+                    onPress={() => navigation.goBack()}
                 >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>

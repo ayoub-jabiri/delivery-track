@@ -1,16 +1,16 @@
+import { Delivery, DeliveryStatus } from "@/src/types";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useNavigation, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+    Modal,
     StyleSheet,
     Text,
-    View,
     TextInput,
     TouchableOpacity,
-    Modal,
+    View,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { Delivery, DeliveryStatus } from "@/src/types";
 import { addDelivery } from "../services/delivery.service";
-import { useRouter } from "expo-router";
 import { colors } from "../styles/colors";
 
 export default function DeliveryForm() {
@@ -24,6 +24,7 @@ export default function DeliveryForm() {
     const [error, setError] = useState<string | null>(null);
 
     const router = useRouter();
+    const navigation = useNavigation();
 
     const statusOptions: DeliveryStatus[] = ["pending", "delivered"];
 
@@ -46,6 +47,8 @@ export default function DeliveryForm() {
             setError(
                 Array.isArray(data?.errors)
                     ? data.errors.join(", ")
+                    : error.response?.data?.error
+                    ? error.response.data.error
                     : "Something went wrong"
             );
         }
@@ -136,6 +139,7 @@ export default function DeliveryForm() {
                 <TouchableOpacity
                     style={styles.cancelButton}
                     activeOpacity={0.7}
+                    onPress={() => navigation.goBack()}
                 >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>

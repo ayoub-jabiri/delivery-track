@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import {
-    View,
-    Text,
-    StyleSheet,
-    ScrollView,
-    TouchableOpacity,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { colors } from "../../styles/colors";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import {
     cancelDelivery,
     confirmDelivery,
     getDeliveryDetails,
 } from "@/src/services/delivery.service";
 import { Delivery } from "@/src/types";
+import { Ionicons } from "@expo/vector-icons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { colors } from "../../styles/colors";
 
 export default function DeliveryDetailsScreen() {
     const { id } = useLocalSearchParams();
@@ -34,7 +34,10 @@ export default function DeliveryDetailsScreen() {
 
                 setDeliveryDetails(response.data);
             } catch (error) {
-                console.error("Error fetching delivery details:", error);
+                console.error(
+                    "Error fetching delivery details:",
+                    error.response
+                );
                 setError(true);
             } finally {
                 setLoading(false);
@@ -50,7 +53,7 @@ export default function DeliveryDetailsScreen() {
 
             return router.navigate("/");
         } catch (error) {
-            console.error("Error cancelling delivery:", error);
+            console.error("Error cancelling delivery:", error.response);
         }
     }
 
@@ -60,7 +63,7 @@ export default function DeliveryDetailsScreen() {
 
             return router.navigate("/");
         } catch (error) {
-            console.error("Error cancelling delivery:", error);
+            console.error("Error cancelling delivery:", error.response);
         }
     }
 
